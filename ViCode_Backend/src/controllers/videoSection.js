@@ -77,12 +77,24 @@ const saveVideoMetadata = async (req, res) => {
       return res.status(400).json({ error: 'Video not found on Cloudinary' });
     }
 
-    // Check if video already exists for this problem and user
-    const existingVideo = await SolutionVideo.findOne({problemId,userId,cloudinaryPublicId});
+    // Check if user already has a video for this problem (prevent duplicates)
+    const existingVideo = await SolutionVideo.findOne({problemId, userId});
 
-    // Check if video already exists for this problem and user
     if (existingVideo) {
-      return res.status(409).json({ error: 'Video already exists' });
+      // If user already has a video for this problem, delete the old one from Cloudinary
+      try {
+        await cloudinary.uploader.destroy(existingVideo.cloudinaryPublicId, { 
+          resource_type: 'video', 
+          invalidate: true 
+        });
+      } catch (cloudinaryError) {
+        console.log('Cloudinary deletion failed (video might not exist):', cloudinaryError.message);
+      }
+      
+      // Delete the old record from database
+      await SolutionVideo.findByIdAndDelete(existingVideo._id);
+      
+      console.log(`Replaced existing video for problem ${problemId} by user ${userId}`);
     }
 
     // const thumbnailUrl = cloudinary.url(cloudinaryResource.public_id, {
@@ -109,13 +121,14 @@ const saveVideoMetadata = async (req, res) => {
 
 
     res.status(201).json({
-      message: 'Video solution saved successfully',
+      message: existingVideo ? 'Video solution updated successfully' : 'Video solution saved successfully',
       videoSolution: {
         id: videoSolution._id,
         thumbnailUrl: videoSolution.thumbnailUrl,
         duration: videoSolution.duration,
         uploadedAt: videoSolution.createdAt
-      }
+      },
+      replaced: !!existingVideo
     });
 
   } catch (error) {

@@ -11,6 +11,7 @@ function AdminUpload(){
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadedVideo, setUploadedVideo] = useState(null);
+    const [wasReplaced, setWasReplaced] = useState(false);
       const {
         register,
         handleSubmit,
@@ -29,6 +30,7 @@ function AdminUpload(){
         
         setUploading(true);
         setUploadProgress(0);
+        setWasReplaced(false);
         clearErrors();
     
         try {
@@ -66,6 +68,7 @@ function AdminUpload(){
           });
     
           setUploadedVideo(metadataResponse.data.videoSolution);
+          setWasReplaced(metadataResponse.data.replaced);
           reset(); // Reset form after successful upload
           
         } catch (err) {
@@ -101,6 +104,12 @@ function AdminUpload(){
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Upload Video</h2>
+              <div className="alert alert-info">
+                <div>
+                  <h4 className="font-bold">📝 Note:</h4>
+                  <p className="text-sm">If you upload a new video for this problem, it will replace your existing video automatically.</p>
+                </div>
+              </div>
               
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* File Input */}
@@ -172,11 +181,18 @@ function AdminUpload(){
     
                 {/* Success Message */}
                 {uploadedVideo && (
-                  <div className="alert alert-success">
+                  <div className={`alert ${wasReplaced ? 'alert-warning' : 'alert-success'}`}>
                     <div>
-                      <h3 className="font-bold">Upload Successful!</h3>
+                      <h3 className="font-bold">
+                        {wasReplaced ? 'Video Updated Successfully!' : 'Upload Successful!'}
+                      </h3>
                       <p className="text-sm">Duration: {formatDuration(uploadedVideo.duration)}</p>
                       <p className="text-sm">Uploaded: {new Date(uploadedVideo.uploadedAt).toLocaleString()}</p>
+                      {wasReplaced && (
+                        <p className="text-sm text-warning-content">
+                          ⚠️ Your previous video for this problem has been replaced.
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}

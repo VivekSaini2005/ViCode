@@ -25,30 +25,9 @@ const ProblemPage = () => {
         const fetchProblem = async () => {
             setLoading(true);
             try {
-                
                 const response = await axiosClient.get(`/problem/problemById/${problemId}`);
-
-                const initialCode = response.data.startCode.find((sc) => {
-                
-                    if (sc.language == "c++" && selectedLanguage == 'cpp')
-                    return true;
-                    else if (sc.language == "Java" && selectedLanguage == 'java')
-                    return true;
-                    else if (sc.language == "Javascript" && selectedLanguage == 'javascript')
-                    return true;
-
-                    return false;
-                })?.initialCode || 'Hello';
-
-                console.log(initialCode);
                 setProblem(response.data);
-                // console.log(response.data.startCode);
-                
-
-                console.log(initialCode);
-                setCode(initialCode);
                 setLoading(false);
-                
             } 
             catch (error) {
                 console.error('Error fetching problem:', error);
@@ -60,8 +39,17 @@ const ProblemPage = () => {
 
     // Update code when language changes
     useEffect(() => {
-        if (problem) {
-            const initialCode = problem.startCode.find(sc => sc.language === selectedLanguage)?.initialCode || '';
+        if (problem && problem.startCode) {
+            const initialCode = problem.startCode.find((sc) => {
+                if (sc.language === "c++" && selectedLanguage === 'cpp')
+                    return true;
+                else if (sc.language === "Java" && selectedLanguage === 'java')
+                    return true;
+                else if (sc.language === "Javascript" && selectedLanguage === 'javascript')
+                    return true;
+                return false;
+            })?.initialCode || '';
+            
             setCode(initialCode);
         }
     }, [selectedLanguage, problem]);
@@ -197,7 +185,7 @@ const ProblemPage = () => {
                     {problem && (
                         <>
                         {activeLeftTab === 'description' && (
-                            <div>
+                            <div className="animate-tabTransition">
                             <div className="flex items-center gap-4 mb-6">
                                 <h1 className="text-2xl font-bold">{problem.title}</h1>
                                 <div className={`badge badge-outline ${getDifficultyColor(problem.difficulty)}`}>
@@ -216,7 +204,7 @@ const ProblemPage = () => {
                                 <h3 className="text-lg font-semibold mb-4">Examples:</h3>
                                 <div className="space-y-4">
                                 {problem.visibleTestCases.map((example, index) => (
-                                    <div key={index} className="bg-base-200 p-4 rounded-lg">
+                                    <div key={index} className="bg-base-200 p-4 rounded-lg animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
                                     <h4 className="font-semibold mb-2">Example {index + 1}:</h4>
                                     <div className="space-y-2 text-sm font-mono">
                                         <div><strong>Input:</strong> {example.input}</div>
@@ -231,7 +219,7 @@ const ProblemPage = () => {
                         )}
 
                         {activeLeftTab === 'editorial' && (
-                            <div className="prose max-w-none">
+                            <div className="prose max-w-none animate-tabTransition">
                             <h2 className="text-xl font-bold mb-4">Editorial</h2>
                             <div className="whitespace-pre-wrap text-sm leading-relaxed">
                                 <Editorial secureUrl={problem.secureUrl} thumbnailUrl={problem.thumbnailUrl} duration={problem.duration}/>
@@ -240,11 +228,11 @@ const ProblemPage = () => {
                         )}
 
                         {activeLeftTab === 'solutions' && (
-                            <div>
+                            <div className="animate-tabTransition">
                             <h2 className="text-xl font-bold mb-4">Solutions</h2>
                             <div className="space-y-6">
                                 {problem.referenceSolution?.map((solution, index) => (
-                                <div key={index} className="border border-base-300 rounded-lg">
+                                <div key={index} className="border border-base-300 rounded-lg animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
                                     <div className="bg-base-200 px-4 py-2 rounded-t-lg">
                                     <h3 className="font-semibold">{problem?.title} - {solution?.language}</h3>
                                     </div>
@@ -260,7 +248,7 @@ const ProblemPage = () => {
                         )}
 
                         {activeLeftTab === 'submissions' && (
-                            <div>
+                            <div className="animate-tabTransition">
                                 <h2 className="text-xl font-bold mb-4">My Submissions</h2>
                                 <div className="text-gray-500">
                                     Your submission history will appear here.
@@ -269,7 +257,7 @@ const ProblemPage = () => {
                         )}
 
                         {activeLeftTab === 'chatAI' && (
-                            <div className="prose max-w-none">
+                            <div className="prose max-w-none animate-tabTransition">
                                 <h2 className="text-xl font-bold mb-4">CHAT with AI</h2>
                                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
                                     <ChatAi problem = {problem}></ChatAi>
@@ -308,14 +296,14 @@ const ProblemPage = () => {
                     {/* Right Content */}
                     <div className="flex-1 flex flex-col">
                     {activeRightTab === 'code' && (
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col animate-tabTransition">
                         {/* Language Selector */}
                         <div className="flex justify-between items-center p-4 border-b border-base-300">
                             <div className="flex gap-2">
                             {['javascript', 'java', 'cpp'].map((lang) => (
                                 <button
                                 key={lang}
-                                className={`btn btn-sm ${selectedLanguage === lang ? 'btn-primary' : 'btn-ghost'}`}
+                                className={`btn btn-sm transition-all duration-200 ${selectedLanguage === lang ? 'btn-primary' : 'btn-ghost hover:btn-primary'}`}
                                 onClick={() => handleLanguageChange(lang)}
                                 >
                                 {lang === 'cpp' ? 'c++' : lang === 'javascript' ? 'JavaScript' : 'Java'}
@@ -325,7 +313,7 @@ const ProblemPage = () => {
                         </div>
 
                         {/* Monaco Editor */}
-                        <div className="flex-1">
+                        <div className="flex-1 animate-fadeIn">
                             <Editor
                             height="100%"
                             language={getLanguageForMonaco(selectedLanguage)}
@@ -360,7 +348,7 @@ const ProblemPage = () => {
                         <div className="p-4 border-t border-base-300 flex justify-between">
                             <div className="flex gap-2">
                             <button 
-                                className="btn btn-ghost btn-sm"
+                                className="btn btn-ghost btn-sm transition-all duration-200 hover:btn-primary"
                                 onClick={() => setActiveRightTab('testcase')}
                             >
                                 Console
@@ -368,14 +356,14 @@ const ProblemPage = () => {
                             </div>
                             <div className="flex gap-2">
                             <button
-                                className={`btn btn-outline btn-sm ${loading ? 'loading' : ''}`}
+                                className={`btn btn-outline btn-sm transition-all duration-200 hover:btn-primary ${loading ? 'loading' : ''}`}
                                 onClick={handleRun}
                                 disabled={loading}
                             >
                                 Run
                             </button>
                             <button
-                                className={`btn btn-primary btn-sm ${loading ? 'loading' : ''}`}
+                                className={`btn btn-primary btn-sm transition-all duration-200 hover:btn-secondary ${loading ? 'loading' : ''}`}
                                 onClick={handleSubmitCode}
                                 disabled={loading}
                             >
@@ -387,10 +375,10 @@ const ProblemPage = () => {
                     )}
 
                     {activeRightTab === 'testcase' && (
-                        <div className="flex-1 p-4 overflow-y-auto">
+                        <div className="flex-1 p-4 overflow-y-auto animate-tabTransition">
                         <h3 className="font-semibold mb-4">Test Results</h3>
                         {runResult ? (
-                            <div className={`alert ${runResult.success ? 'alert-success' : 'alert-error'} mb-4`}>
+                            <div className={`alert ${runResult.success ? 'alert-success' : 'alert-error'} mb-4 animate-fadeIn`}>
                             <div>
                                 {runResult.success ? (
                                 <div>
@@ -400,7 +388,7 @@ const ProblemPage = () => {
                                     
                                     <div className="mt-4 space-y-2">
                                     {runResult.testCases.map((tc, i) => (
-                                        <div key={i} className="bg-base-100 p-3 rounded text-xs">
+                                        <div key={i} className="bg-base-100 p-3 rounded text-xs animate-fadeIn" style={{ animationDelay: `${i * 0.1}s` }}>
                                         <div className="font-mono">
                                             <div><strong>Input:</strong> {tc.stdin}</div>
                                             <div><strong>Expected:</strong> {tc.expected_output}</div>
@@ -418,7 +406,7 @@ const ProblemPage = () => {
                                     <h4 className="font-bold">❌ Error</h4>
                                     <div className="mt-4 space-y-2">
                                     {runResult.testCases.map((tc, i) => (
-                                        <div key={i} className="bg-base-100 p-3 rounded text-xs">
+                                        <div key={i} className="bg-base-100 p-3 rounded text-xs animate-fadeIn" style={{ animationDelay: `${i * 0.1}s` }}>
                                         <div className="font-mono">
                                             <div><strong>Input:</strong> {tc.stdin}</div>
                                             <div><strong>Expected:</strong> {tc.expected_output}</div>
@@ -435,7 +423,7 @@ const ProblemPage = () => {
                             </div>
                             </div>
                         ) : (
-                            <div className="text-gray-500">
+                            <div className="text-gray-500 animate-fadeIn">
                             Click "Run" to test your code with the example test cases.
                             </div>
                         )}
@@ -443,10 +431,10 @@ const ProblemPage = () => {
                     )}
 
                     {activeRightTab === 'result' && (
-                        <div className="flex-1 p-4 overflow-y-auto">
+                        <div className="flex-1 p-4 overflow-y-auto animate-tabTransition">
                         <h3 className="font-semibold mb-4">Submission Result</h3>
                         {submitResult ? (
-                            <div className={`alert ${submitResult.accepted ? 'alert-success' : 'alert-error'}`}>
+                            <div className={`alert ${submitResult.accepted ? 'alert-success' : 'alert-error'} animate-fadeIn`}>
                             <div>
                                 {submitResult.accepted ? (
                                 <div>
@@ -468,7 +456,7 @@ const ProblemPage = () => {
                             </div>
                             </div>
                         ) : (
-                            <div className="text-gray-500">
+                            <div className="text-gray-500 animate-fadeIn">
                             Click "Submit" to submit your solution for evaluation.
                             </div>
                         )}
