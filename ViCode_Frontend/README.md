@@ -76,19 +76,209 @@ frontend mei problemPage mei jake editorial edit kro or components mei ek editor
 
 
 
-# React + Vite
+# ViCode - Coding Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive coding platform with problem-solving capabilities, AI assistance, and video solutions.
 
-Currently, two official plugins are available:
+## 🚀 Recent Updates & Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### ✅ **Code Editor Fixes**
+- **Fixed Start Code Display**: Resolved issue where initial code wasn't showing in the Monaco editor
+- **Language Consistency**: Updated language matching logic to handle all variations (C++, Java, JavaScript)
+- **Smooth Animations**: Added fade-in and slide-in animations for better user experience
 
-## React Compiler
+### ✅ **ChatAI Enhancements**
+- **Typewriter Effect**: Implemented ChatGPT-like typewriter animation for AI responses
+- **Smooth Streaming**: Added character-by-character text animation with blinking cursor
+- **Enhanced UX**: Improved loading states with bouncing dots and smooth transitions
+- **Auto-scroll**: Automatically follows typing animation for better readability
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ✅ **Video Upload System**
+- **Duplicate Prevention**: Fixed issue where same video could be uploaded multiple times
+- **Automatic Replacement**: New videos automatically replace old ones for the same problem
+- **Better Feedback**: Enhanced user notifications for upload success/replacement
+- **Database Cleanup**: Automatic cleanup of old videos from Cloudinary and database
 
-## Expanding the ESLint configuration
+### ✅ **Submission History**
+- **Complete Implementation**: Fixed submission history display in the submissions tab
+- **Real-time Updates**: Shows all user submissions with status, runtime, and memory usage
+- **Code Viewer**: Modal to view submitted code with syntax highlighting
+- **Smooth Animations**: Staggered animations for submission entries
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### ✅ **Database Standardization**
+- **Language Consistency**: Created scripts to standardize language naming across database
+- **Update Scripts**: Provided both Node.js and MongoDB shell scripts for database updates
+- **Error Handling**: Improved error handling and response formatting
+
+## 🛠️ Technical Improvements
+
+### Frontend Enhancements
+- **Smooth Animations**: Added custom CSS animations for better user experience
+- **Responsive Design**: Improved mobile and desktop compatibility
+- **Error Handling**: Better error states and user feedback
+- **Performance**: Optimized re-renders and memory management
+
+### Backend Improvements
+- **API Consistency**: Fixed endpoint mismatches and response formats
+- **Error Handling**: Enhanced error messages and status codes
+- **Data Validation**: Improved input validation and sanitization
+- **Database Queries**: Optimized queries with proper sorting and indexing
+
+## 📁 Project Structure
+
+```
+ViCode_Frontend/
+├── src/
+│   ├── components/
+│   │   ├── ChatAi.jsx          # AI chat with typewriter effect
+│   │   ├── SubmissionHistory.jsx # Submission history display
+│   │   ├── AdminUpload.jsx      # Video upload with duplicate prevention
+│   │   └── ...
+│   ├── pages/
+│   │   ├── Problempage.jsx     # Main problem page with editor
+│   │   └── ...
+│   ├── index.css               # Custom animations and styles
+│   └── ...
+
+ViCode_Backend/
+├── src/
+│   ├── controllers/
+│   │   ├── videoSection.js     # Video upload/delete logic
+│   │   ├── user_submission.js  # Code submission handling
+│   │   └── ...
+│   ├── models/
+│   │   ├── solutionVideo.js    # Video schema
+│   │   ├── submission_Schema.js # Submission schema
+│   │   └── ...
+│   ├── database_update_script.js # Language standardization
+│   └── ...
+```
+
+## 🎯 Key Features
+
+### 1. **Smart Code Editor**
+- Monaco Editor with syntax highlighting
+- Language switching (C++, Java, JavaScript)
+- Real-time code execution and testing
+- Smooth animations and transitions
+
+### 2. **AI-Powered Chat**
+- ChatGPT-like typewriter responses
+- Problem-specific context awareness
+- Smooth streaming animations
+- Auto-scroll during typing
+
+### 3. **Video Solutions**
+- Cloudinary integration for video storage
+- Automatic duplicate prevention
+- Thumbnail generation
+- Admin upload/delete functionality
+
+### 4. **Submission Management**
+- Complete submission history
+- Status tracking (Accepted, Wrong Answer, Error)
+- Runtime and memory usage display
+- Code viewing with syntax highlighting
+
+## 🔧 Installation & Setup
+
+### Frontend Setup
+```bash
+cd ViCode_Frontend
+npm install
+npm run dev
+```
+
+### Backend Setup
+```bash
+cd ViCode_Backend
+npm install
+npm start
+```
+
+### Database Updates
+To standardize language naming:
+```bash
+# Option 1: Node.js script
+node database_update_script.js
+
+# Option 2: MongoDB shell
+mongosh your-database-name < mongodb_update_script.js
+```
+
+## 🎨 Animation System
+
+### Custom CSS Animations
+- `animate-fadeIn`: Smooth fade-in effect
+- `animate-slideIn`: Slide-in from left
+- `animate-slideUp`: Slide-up from bottom
+- `animate-typewriterCursor`: Blinking cursor animation
+- `animate-messageSlideIn`: Message appearance effect
+
+### Usage
+```css
+.element {
+  animation: fadeIn 0.3s ease-out;
+}
+```
+
+## 🚀 Performance Optimizations
+
+- **Efficient Re-renders**: Only animates necessary components
+- **Memory Management**: Proper cleanup of intervals and timers
+- **Smooth Scrolling**: Native smooth scrolling implementation
+- **Responsive Design**: Optimized for all screen sizes
+
+## 📝 API Endpoints
+
+### Submissions
+- `GET /problem/submissionProblem/:id` - Get user submissions for a problem
+- `POST /submission/submit/:id` - Submit code for evaluation
+- `POST /submission/run/:id` - Run code with test cases
+
+### Videos
+- `GET /video/create/:problemId` - Get upload signature
+- `POST /video/save` - Save video metadata
+- `DELETE /video/:problemId` - Delete video
+
+### AI Chat
+- `POST /ai/chat` - Send message to AI assistant
+
+## 🔄 Recent Bug Fixes
+
+1. **Start Code Not Showing**: Fixed language matching logic
+2. **Duplicate Video Uploads**: Implemented automatic replacement
+3. **Submission History Empty**: Fixed API endpoint mismatch
+4. **ChatAI Instant Appearance**: Added smooth typewriter animation
+5. **Database Inconsistency**: Created standardization scripts
+
+## 🎯 Future Enhancements
+
+- [ ] Real-time collaboration features
+- [ ] Advanced code analysis
+- [ ] Performance benchmarking
+- [ ] Social features and leaderboards
+- [ ] Mobile app development
+
+---
+
+## 📚 Dependencies
+
+### Frontend
+- React + Vite
+- DaisyUI + Tailwind CSS
+- Monaco Editor
+- React Hook Form
+- Axios
+- Lucide React
+
+### Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- Cloudinary
+- Judge0 API
+- CORS
+
+---
+
+*Last Updated: January 2025*

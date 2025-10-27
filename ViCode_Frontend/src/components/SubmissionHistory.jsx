@@ -11,8 +11,17 @@ const SubmissionHistory = ({ problemId }) => {
     const fetchSubmissions = async () => {
       try {
         setLoading(true);
-        const response = await axiosClient.get(`/problem/submittedProblem/${problemId}`);
-        setSubmissions(response.data);
+        const response = await axiosClient.get(`/problem/submissionProblem/${problemId}`);
+        
+        // Handle both array and string responses
+        if (Array.isArray(response.data)) {
+          setSubmissions(response.data);
+        } else if (typeof response.data === 'string') {
+          // If backend returns string message, treat as empty array
+          setSubmissions([]);
+        } else {
+          setSubmissions([]);
+        }
         setError(null);
       } catch (err) {
         setError('Failed to fetch submission history');
@@ -22,7 +31,9 @@ const SubmissionHistory = ({ problemId }) => {
       }
     };
 
-    fetchSubmissions();
+    if (problemId) {
+      fetchSubmissions();
+    }
   }, [problemId]);
 
   const getStatusColor = (status) => {
@@ -66,16 +77,16 @@ const SubmissionHistory = ({ problemId }) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6 text-center">Submission History</h2>
+    <div className="w-full">
+      <h2 className="text-2xl font-bold mb-6 text-center">My Submissions</h2>
       
       {submissions.length === 0 ? (
-        <div className="alert alert-info shadow-lg">
+        <div className="alert alert-info shadow-lg animate-fadeIn">
           <div>
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span>No submissions found for this problem</span>
+            <span>No submissions found for this problem. Submit your solution to see it here!</span>
           </div>
         </div>
       ) : (
@@ -96,7 +107,7 @@ const SubmissionHistory = ({ problemId }) => {
               </thead>
               <tbody>
                 {submissions.map((sub, index) => (
-                  <tr key={sub._id}>
+                  <tr key={sub._id} className="animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
                     <td>{index + 1}</td>
                     <td className="font-mono">{sub.language}</td>
                     <td>
@@ -111,10 +122,10 @@ const SubmissionHistory = ({ problemId }) => {
                     <td>{formatDate(sub.createdAt)}</td>
                     <td>
                       <button 
-                        className="btn btn-s btn-outline"
+                        className="btn btn-sm btn-outline hover:btn-primary transition-all duration-200"
                         onClick={() => setSelectedSubmission(sub)}
                       >
-                        Code
+                        View Code
                       </button>
                     </td>
                   </tr>
@@ -123,8 +134,8 @@ const SubmissionHistory = ({ problemId }) => {
             </table>
           </div>
 
-          <p className="mt-4 text-sm text-gray-500">
-            Showing {submissions.length} submissions
+          <p className="mt-4 text-sm text-gray-500 animate-fadeIn">
+            Showing {submissions.length} submission{submissions.length !== 1 ? 's' : ''}
           </p>
         </>
       )}

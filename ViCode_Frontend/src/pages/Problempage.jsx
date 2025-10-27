@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 import axiosClient from "../utils/axios_client";
 import ChatAi from '../components/chatAi';
 import Editorial from '../components/Editorial';
+import SubmissionHistory from '../components/SubmissionHistory';
 
 const ProblemPage = () => {
     const [problem, setProblem] = useState(null);
@@ -41,11 +42,12 @@ const ProblemPage = () => {
     useEffect(() => {
         if (problem && problem.startCode) {
             const initialCode = problem.startCode.find((sc) => {
-                if (sc.language === "c++" && selectedLanguage === 'cpp')
+                const language = sc.language.toLowerCase();
+                if ((language === "c++" || language === "cpp") && selectedLanguage === 'cpp')
                     return true;
-                else if (sc.language === "Java" && selectedLanguage === 'java')
+                else if (language === "java" && selectedLanguage === 'java')
                     return true;
-                else if (sc.language === "Javascript" && selectedLanguage === 'javascript')
+                else if ((language === "javascript" || language === "js") && selectedLanguage === 'javascript')
                     return true;
                 return false;
             })?.initialCode || '';
@@ -249,10 +251,7 @@ const ProblemPage = () => {
 
                         {activeLeftTab === 'submissions' && (
                             <div className="animate-tabTransition">
-                                <h2 className="text-xl font-bold mb-4">My Submissions</h2>
-                                <div className="text-gray-500">
-                                    Your submission history will appear here.
-                                </div>
+                                <SubmissionHistory problemId={problemId} />
                             </div>
                         )}
 
@@ -306,7 +305,7 @@ const ProblemPage = () => {
                                 className={`btn btn-sm transition-all duration-200 ${selectedLanguage === lang ? 'btn-primary' : 'btn-ghost hover:btn-primary'}`}
                                 onClick={() => handleLanguageChange(lang)}
                                 >
-                                {lang === 'cpp' ? 'c++' : lang === 'javascript' ? 'JavaScript' : 'Java'}
+                                {lang === 'cpp' ? 'C++' : lang === 'javascript' ? 'JavaScript' : 'Java'}
                                 </button>
                             ))}
                             </div>

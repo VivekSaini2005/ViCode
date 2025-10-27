@@ -187,14 +187,15 @@ const submitted_problem = async(req,res)=>{
         const userId = req.result._id;
         const problemId = req.params.id;
 
-        const ans = await Submission.find({userId,problemId});
+        const ans = await Submission.find({userId,problemId}).sort({createdAt: -1});
         if(ans.length==0)
-            res.status(200).send("No Submission is persent");
+            return res.status(200).json([]);
 
-        res.status(200).send(ans);
+        res.status(200).json(ans);
     }
     catch(err){
-        res.status(500).send("error from problem_manipulation "+err);
+        console.error("Error fetching submissions:", err);
+        res.status(500).json({ error: "Failed to fetch submissions" });
     }
 }
 module.exports = {create_problem, update_problem, delete_problem, problem_by_id, get_all_problem, solved_problem,submitted_problem}
