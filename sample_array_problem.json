@@ -1,0 +1,60 @@
+{
+  "title": "Two Sum",
+  "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.\n\nExample 1:\nInput: nums = [2,7,11,15], target = 9\nOutput: [0,1]\nExplanation: Because nums[0] + nums[1] == 9, we return [0, 1].\n\nExample 2:\nInput: nums = [3,2,4], target = 6\nOutput: [1,2]\n\nExample 3:\nInput: nums = [3,3], target = 6\nOutput: [0,1]\n\nConstraints:\n• 2 <= nums.length <= 10^4\n• -10^9 <= nums[i] <= 10^9\n• -10^9 <= target <= 10^9\n• Only one valid answer exists.",
+  "difficulty": "easy",
+  "tags": "array",
+  "visibleTestCases": [
+    {
+      "input": "2 7 11 15\n9",
+      "output": "0 1",
+      "explanation": "nums[0] + nums[1] = 2 + 7 = 9, so we return indices [0, 1]"
+    },
+    {
+      "input": "3 2 4\n6",
+      "output": "1 2",
+      "explanation": "nums[1] + nums[2] = 2 + 4 = 6, so we return indices [1, 2]"
+    }
+  ],
+  "hiddenTestCases": [
+    {
+      "input": "3 3\n6",
+      "output": "0 1"
+    },
+    {
+      "input": "1 5 3 7 9\n12",
+      "output": "2 3"
+    },
+    {
+      "input": "-1 -2 -3 -4 -5\n-8",
+      "output": "2 4"
+    }
+  ],
+  "startCode": [
+    {
+      "language": "C++",
+      "initialCode": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nvector<int> twoSum(vector<int>& nums, int target) {\n    // Write your code here\n    \n}\n\nint main() {\n    int n;\n    vector<int> nums;\n    while(cin >> n) nums.push_back(n);\n    int target = nums.back();\n    nums.pop_back();\n    \n    vector<int> result = twoSum(nums, target);\n    cout << result[0] << \" \" << result[1];\n    return 0;\n}"
+    },
+    {
+      "language": "Java",
+      "initialCode": "import java.util.*;\n\nclass Solution {\n    public static int[] twoSum(int[] nums, int target) {\n        // Write your code here\n        \n    }\n    \n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        List<Integer> list = new ArrayList<>();\n        while(sc.hasNextInt()) {\n            list.add(sc.nextInt());\n        }\n        int[] nums = new int[list.size()-1];\n        for(int i=0; i<nums.length; i++) {\n            nums[i] = list.get(i);\n        }\n        int target = list.get(list.size()-1);\n        \n        int[] result = twoSum(nums, target);\n        System.out.print(result[0] + \" \" + result[1]);\n    }\n}"
+    },
+    {
+      "language": "JavaScript",
+      "initialCode": "const readline = require('readline');\nconst rl = readline.createInterface({\n    input: process.stdin,\n    output: process.stdout\n});\n\nfunction twoSum(nums, target) {\n    // Write your code here\n    \n}\n\nlet lines = [];\nrl.on('line', (line) => {\n    lines.push(line);\n}).on('close', () => {\n    const nums = lines[0].split(' ').map(Number);\n    const target = parseInt(lines[1]);\n    const result = twoSum(nums, target);\n    console.log(result[0] + ' ' + result[1]);\n});"
+    }
+  ],
+  "referenceSolution": [
+    {
+      "language": "C++",
+      "completeCode": "#include <iostream>\n#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nvector<int> twoSum(vector<int>& nums, int target) {\n    unordered_map<int, int> map;\n    for(int i = 0; i < nums.size(); i++) {\n        int complement = target - nums[i];\n        if(map.find(complement) != map.end()) {\n            return {map[complement], i};\n        }\n        map[nums[i]] = i;\n    }\n    return {};\n}\n\nint main() {\n    int n;\n    vector<int> nums;\n    while(cin >> n) nums.push_back(n);\n    int target = nums.back();\n    nums.pop_back();\n    \n    vector<int> result = twoSum(nums, target);\n    cout << result[0] << \" \" << result[1];\n    return 0;\n}"
+    },
+    {
+      "language": "Java",
+      "completeCode": "import java.util.*;\n\nclass Solution {\n    public static int[] twoSum(int[] nums, int target) {\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for(int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            if(map.containsKey(complement)) {\n                return new int[]{map.get(complement), i};\n            }\n            map.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n    \n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        List<Integer> list = new ArrayList<>();\n        while(sc.hasNextInt()) {\n            list.add(sc.nextInt());\n        }\n        int[] nums = new int[list.size()-1];\n        for(int i=0; i<nums.length; i++) {\n            nums[i] = list.get(i);\n        }\n        int target = list.get(list.size()-1);\n        \n        int[] result = twoSum(nums, target);\n        System.out.print(result[0] + \" \" + result[1]);\n    }\n}"
+    },
+    {
+      "language": "JavaScript",
+      "completeCode": "const readline = require('readline');\nconst rl = readline.createInterface({\n    input: process.stdin,\n    output: process.stdout\n});\n\nfunction twoSum(nums, target) {\n    const map = new Map();\n    for(let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if(map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}\n\nlet lines = [];\nrl.on('line', (line) => {\n    lines.push(line);\n}).on('close', () => {\n    const nums = lines[0].split(' ').map(Number);\n    const target = parseInt(lines[1]);\n    const result = twoSum(nums, target);\n    console.log(result[0] + ' ' + result[1]);\n});"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ const Submission = require("../models/submission_Schema");
 const SolutionVideo = require("../models/solutionVideo")
 
 const create_problem = async (req,res)=>{
-    const {title,description,difficulty,tags,visibleTestCases,hiddenTestCases,startCode,referenceSolution,problemCreator} = req.body;
+    const {title,description,difficulty,tags,visibleTestCases,hiddenTestCases,startCode,referenceSolution} = req.body;
     
     //check reference solution of given prob is correct or not.
     try{
@@ -30,19 +30,33 @@ const create_problem = async (req,res)=>{
             const test_result = await submit_token(token_result);
 
             for(const test of test_result){
-                console.log(test.status_id);
                 if(test.status_id!=3){
-                    return res.status(400).send("Error Occured");
+                    return res.status(400).json({ 
+                        message: "Reference solution failed test cases",
+                        error: "One or more test cases did not pass with the provided reference solution"
+                    });
                 }
             }
         }
 
         // If all set then store problem in Database.
-        const userProblem = await Problem.create({
-            ...req.body,
+        const problemData = {
+            title,
+            description,
+            difficulty,
+            tags,
+            visibleTestCases,
+            hiddenTestCases,
+            startCode,
+            referenceSolution,
             problemCreator: req.result._id //yeah result user k middleware mei use ho raha hai... {user.result = result}
-        })
-        res.status(201).send("Problem Saved Successfully");
+        };
+        
+        const userProblem = await Problem.create(problemData);
+        res.status(201).json({ 
+            message: "Problem Saved Successfully",
+            problemId: userProblem._id
+        });
     }
     catch(err){
         console.error(err);
@@ -52,15 +66,15 @@ const create_problem = async (req,res)=>{
 
 const update_problem = async (req,res)=>{
     const {id} = req.params;
-    const {title,description,difficulty,tags,visibleTestCases,hiddenTestCases,startCode,referenceSolution, problemCreator} = req.body;
+    const {title,description,difficulty,tags,visibleTestCases,hiddenTestCases,startCode,referenceSolution} = req.body;
     
     try{
         if(!id)
-            return res.send("Prooblem Id Not found");
+            return res.status(400).json({ message: "Problem Id Not found" });
 
         const DSA_Problem = await Problem.findById(id);
         if(!DSA_Problem) 
-            return res.send("Problem not found in server");
+            return res.status(404).json({ message: "Problem not found in server" });
 
         //check for update is correct or not
         for(const {language,completeCode} of referenceSolution){
@@ -83,18 +97,32 @@ const update_problem = async (req,res)=>{
 
             const test_result = await submit_token(token_result);
 
-            for(const res of test_result){
-                if(res.status_id!=3){
-                    return res.status(400).send("Error Occured");
+            for(const result of test_result){
+                if(result.status_id!=3){
+                    return res.status(400).json({ 
+                        message: "Reference solution failed test cases",
+                        error: "One or more test cases did not pass with the provided reference solution"
+                    });
                 }
             }
         }
 
-        const update_prob = await Problem.findByIdAndUpdate(id,{...req.body},{runValidators:true, new:true});
-        res.status(200).send(update_prob);
+        const updateData = {
+            title,
+            description,
+            difficulty,
+            tags,
+            visibleTestCases,
+            hiddenTestCases,
+            startCode,
+            referenceSolution
+        };
+        
+        const update_prob = await Problem.findByIdAndUpdate(id, updateData, {runValidators:true, new:true});
+        res.status(200).json({ message: "Problem updated successfully", problem: update_prob });
     }
     catch(err){
-        res.status(500).send("Error from problem_manipulation : "+err);
+        res.status(500).json({ message: "Error from problem_manipulation", error: err.message });
     }
 }
 

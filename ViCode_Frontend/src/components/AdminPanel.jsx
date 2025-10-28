@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axiosClient from '../utils/axios_client';
 import { useNavigate } from 'react-router';
+import { useState } from 'react';
 
 // Zod schema matching the problem schema
 const problemSchema = z.object({
@@ -39,6 +40,10 @@ const problemSchema = z.object({
 
 function AdminPanel() {
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
+    
     const {register,control,handleSubmit,formState: { errors }} = 
     useForm({
         resolver: zodResolver(problemSchema),
@@ -75,12 +80,29 @@ function AdminPanel() {
     });
 
     const onSubmit = async (data) => {
+        setIsSubmitting(true);
+        setSubmitError(null);
+        setSubmitSuccess(false);
+        
         try {
-        await axiosClient.post('/problem/create', data);
-        alert('Problem created successfully!');
-        navigate('/');
+            console.log('Submitting problem data:', data);
+            const response = await axiosClient.post('/problem/create', data);
+            console.log('Problem created successfully:', response.data);
+            setSubmitSuccess(true);
+            alert('Problem created successfully!');
+            setTimeout(() => {
+                navigate('/');
+            }, 1000);
         } catch (error) {
-        alert(`Error: ${error.response?.data?.message || error.message}`);
+            console.error('Error creating problem:', error);
+            const errorMessage = error.response?.data?.message || 
+                               error.response?.data?.error || 
+                               error.message || 
+                               'Failed to create problem';
+            setSubmitError(errorMessage);
+            alert(`Error: ${errorMessage}`);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -89,6 +111,30 @@ function AdminPanel() {
         <h1 className="text-3xl font-bold mb-6">Create New Problem</h1>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Error Alert */}
+            {submitError && (
+                <div className="alert alert-error shadow-lg">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{submitError}</span>
+                    </div>
+                </div>
+            )}
+            
+            {/* Success Alert */}
+            {submitSuccess && (
+                <div className="alert alert-success shadow-lg">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Problem created successfully!</span>
+                    </div>
+                </div>
+            )}
+            
             {/* Basic Information */}
             <div className="card bg-base-100 shadow-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
@@ -182,23 +228,41 @@ function AdminPanel() {
                     </button>
                     </div>
                     
-                    <input
+                    <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Input (use Enter for new line)</span>
+                    </label>
+                    <textarea
                     {...register(`visibleTestCases.${index}.input`)}
-                    placeholder="Input"
-                    className="input input-bordered w-full"
+                    placeholder="Example: 4&#10;1 2 3 4"
+                    className="textarea textarea-bordered w-full font-mono"
+                    rows={3}
                     />
+                    </div>
                     
-                    <input
+                    <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Output</span>
+                    </label>
+                    <textarea
                     {...register(`visibleTestCases.${index}.output`)}
-                    placeholder="Output"
-                    className="input input-bordered w-full"
+                    placeholder="Expected output"
+                    className="textarea textarea-bordered w-full font-mono"
+                    rows={2}
                     />
+                    </div>
                     
+                    <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Explanation</span>
+                    </label>
                     <textarea
                     {...register(`visibleTestCases.${index}.explanation`)}
                     placeholder="Explanation"
                     className="textarea textarea-bordered w-full"
+                    rows={2}
                     />
+                    </div>
                 </div>
                 ))}
             </div>
@@ -228,17 +292,29 @@ function AdminPanel() {
                     </button>
                     </div>
                     
-                    <input
+                    <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Input (use Enter for new line)</span>
+                    </label>
+                    <textarea
                     {...register(`hiddenTestCases.${index}.input`)}
-                    placeholder="Input"
-                    className="input input-bordered w-full"
+                    placeholder="Example: 4&#10;1 2 3 4"
+                    className="textarea textarea-bordered w-full font-mono"
+                    rows={3}
                     />
+                    </div>
                     
-                    <input
+                    <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Output</span>
+                    </label>
+                    <textarea
                     {...register(`hiddenTestCases.${index}.output`)}
-                    placeholder="Output"
-                    className="input input-bordered w-full"
+                    placeholder="Expected output"
+                    className="textarea textarea-bordered w-full font-mono"
+                    rows={2}
                     />
+                    </div>
                 </div>
                 ))}
             </div>
@@ -285,8 +361,12 @@ function AdminPanel() {
             </div>
             </div>
 
-            <button type="submit" className="btn btn-primary w-full">
-            Create Problem
+            <button 
+                type="submit" 
+                className={`btn btn-primary w-full ${isSubmitting ? 'loading' : ''}`}
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? 'Creating Problem...' : 'Create Problem'}
             </button>
         </form>
         </div>
